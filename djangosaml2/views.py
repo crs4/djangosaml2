@@ -185,7 +185,9 @@ def login(request,
             nsprefix = get_namespace_prefixes()
             session_id, result = client.prepare_for_authenticate(
                 entityid=selected_idp, relay_state=came_from,
-                binding=binding, sign=False, sigalg=sigalg, **authn_custom_args)
+                binding=binding, sign=False, sigalg=sigalg,
+                nsprefix=nsprefix,
+                **authn_custom_args)
         except TypeError as e:
             logger.error('Unable to know which IdP to use')
             return HttpResponse(text_type(e))
