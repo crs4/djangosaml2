@@ -171,6 +171,8 @@ def login(request,
     client = Saml2Client(conf)
     http_response = None
 
+    authn_custom_args = get_custom_setting('SAML_AUTHN_CUSTOM_ARGS', {})
+
     logger.debug('Redirecting user to the IdP via %s binding.', binding)
     if binding == BINDING_HTTP_REDIRECT:
         try:
@@ -184,7 +186,7 @@ def login(request,
             session_id, result = client.prepare_for_authenticate(
                 entityid=selected_idp, relay_state=came_from,
                 binding=binding, sign=False, sigalg=sigalg,
-                nsprefix=nsprefix)
+                nsprefix=nsprefix, **authn_custom_args)
         except TypeError as e:
             logger.error('Unable to know which IdP to use')
             return HttpResponse(text_type(e))
@@ -200,7 +202,7 @@ def login(request,
                 return HttpResponse(text_type(e))
             session_id, request_xml = client.create_authn_request(
                 location,
-                binding=binding)
+                binding=binding, **authn_custom_args)
             try:
                 if PY3:
                     saml_request = base64.b64encode(binary_type(request_xml, 'UTF-8'))
@@ -222,7 +224,7 @@ def login(request,
             try:
                 session_id, result = client.prepare_for_authenticate(
                     entityid=selected_idp, relay_state=came_from,
-                    binding=binding)
+                    binding=binding, **authn_custom_args)
             except TypeError as e:
                 logger.error('Unable to know which IdP to use')
                 return HttpResponse(text_type(e))
