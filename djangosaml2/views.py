@@ -180,7 +180,7 @@ def login(request,
             # generate the signature as a URL param
             sig_alg_option_map = {'sha1': SIG_RSA_SHA1,
                                   'sha256': SIG_RSA_SHA256}
-            sig_alg_option = getattr(conf, '_sp_authn_requests_signed_alg', 'sha1')
+            sig_alg_option = getattr(conf, '_sp_authn_requests_signed_alg', 'sha256')
             sigalg = sig_alg_option_map[sig_alg_option] if sign_requests else None
             nsprefix = get_namespace_prefixes()
             session_id, result = client.prepare_for_authenticate(
@@ -188,6 +188,7 @@ def login(request,
                 binding=binding, sign=False, sigalg=sigalg,
                 nsprefix=nsprefix,
                 **authn_custom_args)
+
         except TypeError as e:
             logger.error('Unable to know which IdP to use')
             return HttpResponse(text_type(e))
